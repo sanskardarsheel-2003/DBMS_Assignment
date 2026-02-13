@@ -1,0 +1,140 @@
+-----------------------------------------
+-- DATABASE LAB: DATA RETRIEVAL USING SQL
+-- Oracle SQL Script
+-----------------------------------------
+
+-------------------------------
+-- 1. CREATE TABLES
+-------------------------------
+
+CREATE TABLE Student (
+  StudentID NUMBER PRIMARY KEY,
+  Name VARCHAR2(50),
+  DateOfBirth DATE,
+  Gender VARCHAR2(10),
+  ContactNumber VARCHAR2(15),
+  DeptID NUMBER
+);
+
+CREATE TABLE Faculty (
+  FacultyID NUMBER PRIMARY KEY,
+  Name VARCHAR2(50),
+  Designation VARCHAR2(30),
+  Email VARCHAR2(50),
+  DeptID NUMBER
+);
+
+CREATE TABLE Course (
+  CourseID NUMBER PRIMARY KEY,
+  CourseName VARCHAR2(50),
+  Credits NUMBER,
+  DeptID NUMBER,
+  FacultyID NUMBER,
+  FOREIGN KEY (FacultyID)
+    REFERENCES Faculty(FacultyID)
+);
+
+CREATE TABLE Enrollment (
+  EnrollmentID NUMBER PRIMARY KEY,
+  StudentID NUMBER,
+  CourseID NUMBER,
+  Semester NUMBER,
+  Grade VARCHAR2(5),
+  FOREIGN KEY (StudentID)
+    REFERENCES Student(StudentID),
+  FOREIGN KEY (CourseID)
+    REFERENCES Course(CourseID)
+);
+
+-------------------------------
+-- 2. INSERT SAMPLE DATA
+-------------------------------
+
+-- Faculty
+INSERT INTO Faculty VALUES (1,'Dr. Ananya Sharma','Professor','ananya@college.edu',101);
+INSERT INTO Faculty VALUES (2,'Dr. Rakesh Mehta','Associate Professor','rmehta@college.edu',102);
+INSERT INTO Faculty VALUES (3,'Dr. Kavita Rao','Assistant Professor','kavita@college.edu',103);
+
+-- Students
+INSERT INTO Student VALUES (1,'Aarav Verma',DATE '2002-03-15','Male','9876501234',101);
+INSERT INTO Student VALUES (2,'Ishita Singh',DATE '2003-07-21','Female','9123405678',102);
+INSERT INTO Student VALUES (3,'Rohan Das',DATE '2001-11-10','Male','9988771122',101);
+INSERT INTO Student VALUES (4,'Neha Patel',DATE '2004-01-05','Female','9090901234',103);
+INSERT INTO Student VALUES (5,'Karan Gupta',DATE '2002-09-18','Male','9012345678',102);
+
+-- Courses
+INSERT INTO Course VALUES (1,'Database Systems',4,101,1);
+INSERT INTO Course VALUES (2,'Data Structures',3,102,2);
+INSERT INTO Course VALUES (3,'Operating Systems',5,101,1);
+INSERT INTO Course VALUES (4,'Artificial Intelligence',4,103,3);
+
+-- Enrollment
+INSERT INTO Enrollment VALUES (1,1,1,4,'A');
+INSERT INTO Enrollment VALUES (2,2,2,3,'B');
+INSERT INTO Enrollment VALUES (3,3,3,4,'A');
+INSERT INTO Enrollment VALUES (4,4,4,2,'B');
+INSERT INTO Enrollment VALUES (5,5,2,3,'C');
+
+COMMIT;
+
+-------------------------------
+-- 3. DATA RETRIEVAL QUERIES
+-------------------------------
+
+-- PART A: Aliases
+SELECT StudentID Roll_No, Name Student_Name,
+       DateOfBirth DOB, Gender,
+       ContactNumber Contact, DeptID Dept
+FROM Student;
+
+SELECT StudentID Roll_No, Name Student_Name, DeptID Dept_ID
+FROM Student;
+
+SELECT FacultyID Faculty_ID, Name Faculty_Name,
+       Designation, Email
+FROM Faculty;
+
+SELECT CourseID Course_ID, CourseName Course_Name,
+       Credits, DeptID
+FROM Course;
+
+SELECT EnrollmentID Enroll_ID,
+       StudentID, CourseID,
+       Semester, Grade
+FROM Enrollment;
+
+-- PART B: WHERE
+SELECT * FROM Student WHERE DeptID=101;
+SELECT * FROM Student WHERE Gender='Female';
+SELECT * FROM Faculty WHERE Designation='Assistant Professor';
+SELECT * FROM Faculty WHERE DeptID=102;
+SELECT * FROM Course WHERE Credits>=4;
+SELECT * FROM Student WHERE DateOfBirth>DATE '2003-01-01';
+SELECT * FROM Enrollment WHERE Semester=4;
+
+-- PART C: Sorting & Limiting
+SELECT * FROM Student ORDER BY Name;
+SELECT * FROM Student ORDER BY DateOfBirth DESC;
+SELECT * FROM Faculty ORDER BY Designation;
+SELECT * FROM Course ORDER BY Credits DESC;
+SELECT * FROM Student WHERE ROWNUM<=3;
+SELECT * FROM Course WHERE ROWNUM<=5;
+
+-- PART D: Derived Output
+SELECT Name,
+FLOOR(MONTHS_BETWEEN(SYSDATE,DateOfBirth)/12) Age
+FROM Student;
+
+SELECT CourseName, Credits+1 Updated_Credits
+FROM Course;
+
+SELECT EnrollmentID, Grade Final_Grade
+FROM Enrollment;
+
+SELECT Name,
+EXTRACT(YEAR FROM DateOfBirth) Birth_Year
+FROM Student;
+
+SELECT Name,
+SUBSTR(Email,INSTR(Email,'@')+1) Domain
+FROM Faculty;
